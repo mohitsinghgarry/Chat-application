@@ -48,7 +48,7 @@ const SignUpPage = () => {
               >
                 <MessageSquare className="size-6 text-primary" />
               </div>
-              <h1 className="text-2xl font-bold mt-2">Create Account</h1>
+              <h1 className="text-2xl font-bold mt-2">Join Portal Talk</h1>
               <p className="text-base-content/60">Get started with your free account</p>
             </div>
           </div>
