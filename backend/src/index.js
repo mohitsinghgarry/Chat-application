@@ -20,21 +20,57 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://chat-application-two-silk-96.vercel.app"
-    ],
+    origin: function (origin, callback) {
+      const allowedOrigins = [
+        "http://localhost:5173",
+        "https://chat-application-two-silk-96.vercel.app"
+      ];
+
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        console.log("Blocked origin:", origin);
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
+    exposedHeaders: ["Set-Cookie"],
   })
 );
+
+// Handle preflight requests explicitly
+app.options('*', cors());
+
+// Additional CORS headers for cookie support
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  const allowedOrigins = [
+    "http://localhost:5173",
+    "https://chat-application-two-silk-96.vercel.app"
+  ];
+
+  if (allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cookie');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+
+  next();
+});
 
 // Debug middleware to log all requests
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.path}`);
+  console.log("Origin:", req.headers.origin);
   console.log("Cookies:", req.cookies);
-  console.log("Headers:", req.headers);
+  console.log("User-Agent:", req.headers['user-agent']);
   next();
 });
 
