@@ -50,6 +50,7 @@ export const signup = async (req, res) => {
 export const login = async (req, res) => {
   const { email, password } = req.body;
   try {
+    console.log("Login attempt for email:", email);
     const user = await User.findOne({ email });
 
     if (!user) {
@@ -61,7 +62,10 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    generateToken(user._id, res);
+    console.log("Login successful, generating token...");
+    const token = generateToken(user._id, res);
+    console.log("Token generated:", token ? "Success" : "Failed");
+    console.log("NODE_ENV:", process.env.NODE_ENV);
 
     res.status(200).json({
       _id: user._id,

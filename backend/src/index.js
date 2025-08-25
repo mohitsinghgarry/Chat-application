@@ -30,8 +30,21 @@ app.use(
   })
 );
 
+// Debug middleware to log all requests
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path}`);
+  console.log("Cookies:", req.cookies);
+  console.log("Headers:", req.headers);
+  next();
+});
+
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
+
+// Test endpoint
+app.get("/api/test", (req, res) => {
+  res.json({ message: "Server is working", cookies: req.cookies });
+});
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));
